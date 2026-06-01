@@ -99,7 +99,6 @@
             transform: scale(1.1);
             background: #128C7E;
         }
-        /* Phone input styling */
         .phone-wrapper {
             display: flex;
             align-items: center;
@@ -350,7 +349,7 @@
         </div>
     </section>
 
-    <!-- Order Form Section -->
+    <!-- Order Form Section (без поля даты) -->
     <section id="order" class="py-16 px-4 bg-gradient-to-r from-pink-100 to-pink-200">
         <div class="container mx-auto max-w-2xl">
             <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
@@ -395,11 +394,6 @@
                         </select>
                     </div>
                     
-                    <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Ыңгайлуу дата жана убакыт *</label>
-                        <input type="datetime-local" id="datetime" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-400">
-                    </div>
-                    
                     <div class="mb-6">
                         <label class="block text-gray-700 font-medium mb-2">Кошумча маалымат</label>
                         <textarea id="message" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-400" placeholder="Суроолоруңуз же каалоолоруңуз..."></textarea>
@@ -432,8 +426,8 @@
 
     <script>
         // ========== КОНФИГУРАЦИЯ ==========
-        // ⚠️ МААНИЛҮҮ: Apps Scriptти жайгаштыргандан кийин төмөнкү URLди өзгөртүңүз!
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBSQfer1oVrrGPP-X2RQNgFtyectZuipzuogBhVX47FskVhIqkI3EX776N1mRFA0Gd/exec";
+        // Apps Script URL - ӨЗҮҢДҮН URLИҢДИ ЖАЗ
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYRb9bW0gBrtgjKrmdoZZj8jhUiV36O9QG2lIz9yNbedAwE0TrfY-eFDDty0SWl37r/exec";
         // =================================
         
         // Mobile menu
@@ -496,23 +490,22 @@
             
             // Телефон номерин толук форматка келтирүү
             let phoneNumber = document.getElementById('phone').value;
-            // Сандарды гана алуу
             phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
             
-            // Эгер 9 сан болсо, толук номерди түзүү
             let fullPhone = "+996" + phoneNumber;
             
+            // Маалыматтарды даярдоо (datetime жок)
             const data = {
                 name: document.getElementById('name').value,
                 surname: document.getElementById('surname').value,
                 phone: fullPhone,
                 service: document.getElementById('service').value,
-                datetime: document.getElementById('datetime').value,
+                datetime: "",  // Бош калтырылды
                 message: document.getElementById('message').value
             };
             
             // Валидация
-            if (!data.name || !data.surname || !data.phone || !data.service || !data.datetime) {
+            if (!data.name || !data.surname || !data.service) {
                 alert("Бардык милдеттүү талааларды толтуруңуз!");
                 return;
             }
@@ -525,7 +518,7 @@
             showLoading();
             
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
+                await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -541,14 +534,6 @@
                 showErrorModal();
             }
         });
-        
-        // Set min datetime
-        const datetimeInput = document.getElementById('datetime');
-        if(datetimeInput) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            datetimeInput.min = now.toISOString().slice(0, 16);
-        }
     </script>
 </body>
 </html>
