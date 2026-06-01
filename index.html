@@ -99,6 +99,33 @@
             transform: scale(1.1);
             background: #128C7E;
         }
+        /* Phone input styling */
+        .phone-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: white;
+        }
+        .phone-prefix {
+            background: #f8fafc;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #1e293b;
+            border-right: 1px solid #e2e8f0;
+            font-size: 15px;
+        }
+        .phone-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+        }
+        .phone-input:focus {
+            outline: none;
+        }
         @media (max-width: 768px) {
             .whatsapp-float {
                 width: 48px;
@@ -345,7 +372,14 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-700 font-medium mb-2">Телефон номериңиз *</label>
-                        <input type="tel" id="phone" placeholder="+996 700 123 456" required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-pink-400">
+                        <div class="phone-wrapper">
+                            <span class="phone-prefix">+996</span>
+                            <input type="tel" id="phone" placeholder="700 123 456" required 
+                                   class="phone-input"
+                                   maxlength="12"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Мисал: 700 123 456</p>
                     </div>
                     
                     <div class="mb-4">
@@ -398,17 +432,19 @@
 
     <script>
         // ========== КОНФИГУРАЦИЯ ==========
-        // ⚠️ МААНИЛҮҮ: Google Apps Scriptти жайгаштыргандан кийин төмөнкү URLди өзгөртүңүз!
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyK_dLQN0Bly0nd1K-xivXACOGnebZSBGV-NzNSkZSp1mfzkpfnkBR1mYC8j0Y-Lv8V/exec";
+        // ⚠️ МААНИЛҮҮ: Apps Scriptти жайгаштыргандан кийин төмөнкү URLди өзгөртүңүз!
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBSQfer1oVrrGPP-X2RQNgFtyectZuipzuogBhVX47FskVhIqkI3EX776N1mRFA0Gd/exec";
         // =================================
         
         // Mobile menu
         const mobileBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         
-        mobileBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
         
         // Close mobile menu on click link
         document.querySelectorAll('#mobileMenu a').forEach(link => {
@@ -458,19 +494,33 @@
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            let phone = document.getElementById('phone').value;
-            if(phone && !phone.startsWith('+')) {
-                phone = '+996 ' + phone;
-            }
+            // Телефон номерин толук форматка келтирүү
+            let phoneNumber = document.getElementById('phone').value;
+            // Сандарды гана алуу
+            phoneNumber = phoneNumber.replace(/[^0-9]/g, '');
+            
+            // Эгер 9 сан болсо, толук номерди түзүү
+            let fullPhone = "+996" + phoneNumber;
             
             const data = {
                 name: document.getElementById('name').value,
                 surname: document.getElementById('surname').value,
-                phone: phone,
+                phone: fullPhone,
                 service: document.getElementById('service').value,
                 datetime: document.getElementById('datetime').value,
                 message: document.getElementById('message').value
             };
+            
+            // Валидация
+            if (!data.name || !data.surname || !data.phone || !data.service || !data.datetime) {
+                alert("Бардык милдеттүү талааларды толтуруңуз!");
+                return;
+            }
+            
+            if (phoneNumber.length !== 9) {
+                alert("Телефон номериңизди туура жазыңыз! (9 сан)");
+                return;
+            }
             
             showLoading();
             
